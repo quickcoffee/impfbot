@@ -35,6 +35,8 @@ sleep_between_requests_in_s=150
 sleep_between_failed_requests_in_s=15
 ;Wenn eine Abfrage 10x fehlschlaegt ist die IP vermutlich gebannt. Standardmaeßig wird dann 3h gewartet
 sleep_after_ipban_in_min=180
+;Cooldown nachdem ein Impftermin gefunden wurde. Standardmaeßig wird dann 15min gewartet (in min)
+cooldown_after_found_in_min=15
 ;Zufällige Zeitspanne von 0-jtter die auf die Wartezeiten addiert wird
 jitter=5
 ;Legt fest ob der Bot nachts schlafen soll (Default: true da eh keine Termine veröffentlicht werden)
