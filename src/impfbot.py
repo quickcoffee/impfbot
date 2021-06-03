@@ -25,7 +25,7 @@ def check_for_slot() -> None:
                 log.info(
                     f"Free slot! ({elem['freeSlotSizeOnline']}) {elem['vaccineName']}/{elem['vaccineType']}")
 
-                msg = f"Freier Impfslot ({elem['freeSlotSizeOnline']})! {elem['vaccineName']}/{elem['vaccineType']}"
+                msg = f"{settings.NAME}! Vaccine available: ({elem['freeSlotSizeOnline']})! {elem['vaccineName']}/{elem['vaccineType']} \n Book: https://www.impfportal-niedersachsen.de/portal/#/appointment/public"
                 alerts.alert(msg)
 
                 sleep(settings.COOLDOWN_AFTER_FOUND_IN_MIN, 0)

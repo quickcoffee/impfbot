@@ -1,8 +1,10 @@
+from configparser import Error
 import smtplib
 from email.message import EmailMessage
 from email.utils import formatdate
 from telegram.ext import Updater
 from telegram.parsemode import ParseMode
+import zulip
 import webbrowser
 import logging
 
@@ -35,6 +37,17 @@ def alert(msg: str, verbose: bool = False) -> None:
             log.error(f"Couldn't send mail: {e}")
     else:
         verbose_info(f"[EMAIL] send_mail is not set to true skipping")
+
+    if settings.SEND_ZULIP:
+        verbose_info(f"[ZULIP] try to send Zulip message")
+        try:
+            send_zulip_msg(msg)
+            verbose_info(f"[ZULIP] sending Zulip message was successful")
+        except Exception as e:
+            log.error(f"Couldn't send Zulip message: {e}")
+    else:
+        verbose_info(
+            f"[ZULIP] send_zulip_msg is not set to true skipping")
 
     if settings.SEND_TELEGRAM_MSG:
         verbose_info(f"[TELEGRAM] try to send telegram message")
@@ -86,3 +99,31 @@ def send_telegram_msg(msg: str) -> None:
             text=f"*{msg}*\n{appointment_url}",
             parse_mode=ParseMode.MARKDOWN
         )
+
+def zulip_send_payload() -> dict:
+    request = {
+        'type': settings.ZULIP_TYPE,
+        'to': settings.ZULIP_TARGET,
+    }
+    if request.get('type') == 'stream': request.setdefault('topic', settings.ZULIP_TOPIC)
+    return request
+    
+def zulip_client():
+    try:
+        return zulip.Client(
+            email=settings.ZULIP_MAIL,
+            site=settings.ZULIP_URL,
+            api_key=settings.ZULIP_KEY
+        )
+    except:
+        log.exception('An error occurred trying to instantiate Zulip Client')
+        return None
+
+def send_zulip_msg(msg: str) -> None:
+    """ Just send a message; no logic going on here """
+    client = zulip_client()
+    if client is None: return
+    request = zulip_send_payload()
+    request.setdefault('content', msg)
+    r = client.send_message(request)
+    if r.get('result') != 'success': raise Error

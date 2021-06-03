@@ -33,6 +33,13 @@ except Exception as e:
     log.warning(f"[COMMON] Invalid birthdate: {e}")
 
 try:
+    NAME = config["COMMON"]["name"]
+except KeyError as e:
+    log.warning(
+        f"[COMMON] '{e}' is missing in Config. Cant run without name. Exit.")
+    sys.exit(1)
+
+try:
     SEND_EMAIL = True if config["EMAIL"]["enable"].lower() == "true" else False
 except KeyError:
     log.warning(
@@ -49,6 +56,28 @@ try:
 except KeyError as e:
     log.warning(f"[EMAIL] '{e}' is missing in Config. Set Email to False")
     SEND_EMAIL = False
+
+try:
+    SEND_ZULIP = True if config["ZULIP"]["enable"].lower() == "true" else False
+except KeyError:
+    log.warning(
+        "[ZULIP] 'enable' is missing in Config. Set False"
+    )
+    SEND_ZULIP = False
+
+try:
+    if SEND_ZULIP:
+        ZULIP_URL = config["ZULIP"]["zulip_url"]
+        ZULIP_MAIL = config["ZULIP"]["zulip_mail"]
+        ZULIP_KEY = config["ZULIP"]["zulip_key"]
+        ZULIP_TYPE = config["ZULIP"]["zulip_type"]
+        ZULIP_TARGET = config["ZULIP"]["zulip_target"]
+        ZULIP_TOPIC = config["ZULIP"]["zulip_topic"]
+except KeyError as e:
+    log.warning(f"[ZULIP] '{e}' is missing in Config. Set Zulip to False")
+    SEND_ZULIP = False
+
+
 
 try:
     SEND_TELEGRAM_MSG = True if config["TELEGRAM"]["enable_telegram"].lower(
